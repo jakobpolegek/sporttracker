@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SportTracker</string>
+    <string name="sporttracker">SportTracker</string>
+    <string name="new_run">New Run</string>
+    <string name="leaderboards">Leaderboards</string>
+    <string name="my_runs">My Runs</string>
+    <string name="my_previous_runs">My Previous Runs</string>
 </resources>
