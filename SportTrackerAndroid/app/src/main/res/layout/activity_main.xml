@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="35dp"
         android:text="@string/my_previous_runs"
+        android:onClick="OpenMyPreviousRuns"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnNewRun"
@@ -47,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="35dp"
         android:text="@string/leaderboards"
+        android:onClick="OpenLeaderboards"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnPreviousRuns" />
