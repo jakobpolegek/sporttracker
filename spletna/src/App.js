@@ -6,7 +6,7 @@ import { db, auth } from "./firebase";
 import { Button, makeStyles, Modal, Input } from "@material-ui/core";
 import FlipMove from "react-flip-move";
 import ReactDOM from 'react-dom';
-
+  
 
 function getModalStyle() {
   const top = 50;
@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
+  const [copy, setCopy] = useState();
   const [modalStyle] = useState(getModalStyle);
   const [posts, setPosts] = useState([]);
   const [username, setUsername] = useState("");
@@ -64,10 +65,19 @@ function App() {
   }, [user, username]);
 
   useEffect(() => {
+    const query = db.collection("posts").where('pot','not-in',['null']);
+    query.get().then(snapshot => {
+      snapshot.docs.forEach(doc => {
+        setCopy(Array.from(doc.data().pot));
+        
+      })
+    }) 
     db.collection("posts")
       .onSnapshot((snapshot) =>
         setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
       );
+      //console.log(copy);
+       
   }, []);
 
   const handleLogin = (e) => {
@@ -159,13 +169,21 @@ function App() {
       <div className="app__posts">
         <div className="app__postsLeft">
           <FlipMove>
-            {posts.map(({ id, post }) => (
+            {
+            posts.map(({ id, post }) => (
               <Post
                 user={user}
                 key={id}
                 postId={id}
                 username={post.username}
                 caption={post.caption}
+                weight={post.weight}
+                height={post.height}
+                calories_burned={post.calories_burned}
+                avg_heartrate={post.avg_heartrate}
+                time={post.time}
+                distance={post.distance}
+                pot={copy}
               />
             ))}
           </FlipMove>
