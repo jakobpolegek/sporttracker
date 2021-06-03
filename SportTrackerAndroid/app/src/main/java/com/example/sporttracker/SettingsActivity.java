@@ -14,8 +14,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.sporttracker.ApplicationMy;
-
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 public class SettingsActivity extends AppCompatActivity {
     public static final int ACTIVITY_ID=606;
