@@ -15,7 +15,7 @@ const ImageUpload = ({ username }) => {
       setImage(e.target.files[0]);
     }
   };
-
+  
   const handleUpload = () => {
     const uploadTask = storage.ref(`images/${image.name}`).put(image);
     uploadTask.on(

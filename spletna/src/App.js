@@ -65,7 +65,6 @@ function App() {
 
   useEffect(() => {
     db.collection("posts")
-      .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) =>
         setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
       );
@@ -167,9 +166,6 @@ function App() {
                 postId={id}
                 username={post.username}
                 caption={post.caption}
-                imageUrl={post.imageUrl}
-                timestamp={post.timestamp}
-                upvotes={post.upvotes}  
               />
             ))}
           </FlipMove>
