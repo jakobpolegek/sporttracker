@@ -68,7 +68,7 @@ function App() {
     const query = db.collection("posts").where('pot','not-in',['null']);
     query.get().then(snapshot => {
       snapshot.docs.forEach(doc => {
-        setCopy(Array.from(doc.data().pot));
+        
         
       })
     }) 
