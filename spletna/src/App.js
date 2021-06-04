@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
-  const [copy, setCopy] = useState();
+  //const [copy, setCopy] = useState();
   const [modalStyle] = useState(getModalStyle);
   const [posts, setPosts] = useState([]);
   const [username, setUsername] = useState("");
@@ -65,13 +65,8 @@ function App() {
   }, [user, username]);
 
   useEffect(() => {
-    const query = db.collection("posts").where('pot','not-in',['null']);
-    query.get().then(snapshot => {
-      snapshot.docs.forEach(doc => {
-        setCopy(Array.from(doc.data().pot));
-        
-      })
-    }) 
+    var copy;
+
     db.collection("posts")
       .onSnapshot((snapshot) =>
         setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
@@ -183,7 +178,7 @@ function App() {
                 avg_heartrate={post.avg_heartrate}
                 time={post.time}
                 distance={post.distance}
-                pot={copy}
+                pot={post.pot}
               />
             ))}
           </FlipMove>

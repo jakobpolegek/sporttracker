@@ -2,7 +2,8 @@ import React, { useState, useEffect, forwardRef } from "react";
 import "./Post.css";
 import { db } from "./firebase";
 import firebase from "firebase"; 
-
+//pot={post.pot["lon"]}
+//<br></br><b>PATH:{pot} </b>
 const Post = forwardRef(
   ({ user, username, postId, caption, height,weight,calories_burned,avg_heartrate,time,distance,pot}, ref) => {
     useEffect(() => {
@@ -33,7 +34,12 @@ const Post = forwardRef(
           <div className="post__header"></div>
             <br></br><b>DURATION: </b>{time} seconds.
             <br></br><b>DISTANCE: </b>{distance} meters.
-            <br></br><b>PATH:{pot} </b>
+            <div>
+            <b>LOCATION: </b>
+              {pot.map(item => (
+                <p><b>Lon: </b>{item.lon}<br/><b>Lat: </b>{item.lat}<br/></p>
+                ))}
+          </div>
         </h4>
       </div>
     );
