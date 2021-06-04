@@ -45,19 +45,12 @@
 .app__header {
   position: sticky;
   top: 0;
-  display: flex;
-  justify-content: space-between;
   z-index: 1;
   background-color: #1c1d3c;
-  margin-bottom: 30%;
   font-size: 40px;
-  width:100px;
-  margin-left:28%;
   display: inline-flex;
-}
-
-.app__header {
-  padding-left: 200px;
+  width: 100%;
+  justify-content: center;
 }
 
 .app__posts {
