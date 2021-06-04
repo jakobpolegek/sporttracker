@@ -65,8 +65,6 @@ function App() {
   }, [user, username]);
 
   useEffect(() => {
-    var copy;
-
     db.collection("posts")
       .onSnapshot((snapshot) =>
         setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
