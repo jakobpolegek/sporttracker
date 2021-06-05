@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useEffect, forwardRef } from "react";
 import "./Post.css";
 import { db } from "./firebase";
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
@@ -48,7 +48,7 @@ const Post = forwardRef(
             <br></br><b>DISTANCE: </b>{distance} meters.
             <div>
             <b>LOCATION: </b>
-            <MapContainer center={[pot[0].lat, pot[0].lon]} zoom={9} scrollWheelZoom={false}>
+            <MapContainer center={[pot[0].lat, pot[0].lon]} zoom={6} scrollWheelZoom={false}>
                   <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
