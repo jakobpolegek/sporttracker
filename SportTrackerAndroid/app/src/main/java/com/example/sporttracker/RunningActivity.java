@@ -75,7 +75,9 @@ public class RunningActivity extends AppCompatActivity {
                 if (b.getText().equals("stop")) {
 
                     timerHandler.removeCallbacks(timerRunnable);
-                    b.setText("start");
+
+                    startActivity(new Intent(RunningActivity.this,VideoActivity.class));
+                    //b.setText("start");
 
                 } else {
                     startTime = System.currentTimeMillis();
@@ -136,6 +138,7 @@ public class RunningActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+
         timerHandler.removeCallbacks(timerRunnable);
         locationManager.removeUpdates(locationListenerGPS);
         Button b = (Button)findViewById(R.id.button);

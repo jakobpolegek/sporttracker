@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +25,15 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int ACTIVITY_ID=606;
+    public static final String HEIGHT = "HEIGHT";
+    public static final String WEIGHT = "WEIGHT";
+    public static final String USERNAME = "USERNAME";
+    public static final String AGE = "AGE";
+    public static final String GENDER = "GENDER";
+
+    ApplicationMy app;
+    SharedPreferences sp;
     private Button logout;
     private TextView textViewUser;
     private String userID;
@@ -35,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        app = (ApplicationMy) getApplication();
+
         logout = (Button) findViewById(R.id.signOut);
 
         logout.setOnClickListener(new View.OnClickListener() {
@@ -45,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         textViewUser = findViewById(R.id.userTxt);
         user = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -70,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OpenLeaderboards(View view) {
-
+        app.thisUser.addLocation(new User.Lokacija(1,2));
+        app.thisUser.addLocation(new User.Lokacija(2,3));
+        app.thisUser.setHeight(sp.getFloat(HEIGHT,0));
+        app.thisUser.setWeight(sp.getFloat(WEIGHT,0));
+        app.thisUser.setAge(sp.getInt(AGE,0));
+        app.thisUser.addToFirebase();
     }
 
     public void OpenMyPreviousRuns(View view) {

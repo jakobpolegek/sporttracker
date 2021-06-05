@@ -3,6 +3,7 @@ package com.example.sporttracker;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -95,6 +96,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
                     if(user.isEmailVerified()){
+                        ApplicationMy app = (ApplicationMy) getApplication();
+                        app.createUser();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     }else{
                         user.sendEmailVerification();

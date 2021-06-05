@@ -1,5 +1,19 @@
 package com.example.sporttracker;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 public class User {
@@ -7,6 +21,29 @@ public class User {
     static class Lokacija{
         double lat;
         double lon;
+
+
+
+        public Lokacija(double a, double b){
+            lat = a;
+            lon = b;
+        }
+
+        public double getLat() {
+            return lat;
+        }
+
+        public double getLon() {
+            return lon;
+        }
+
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+
+        public void setLon(double lon) {
+            this.lon = lon;
+        }
     }
 
     String username;
@@ -19,6 +56,7 @@ public class User {
     Vector<Lokacija> pot;
 
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public User(){}
 
@@ -39,8 +77,8 @@ public class User {
     }
     //endregion
 
-    void addLocation(Lokacija l){
-        pot.add(l);
+    void addLocation(Lokacija a){
+        pot.add(a);
     }
 
     //region Getter
@@ -84,6 +122,20 @@ public class User {
     //endregion
 
     //region Setter
+
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -102,4 +154,50 @@ public class User {
     //endregion
 
 
+    void addToFirebase(){
+        Map<String, Object> user = new HashMap<>();
+        user.put("username", username);
+        user.put("weight", weight);
+        user.put("height", height);
+        user.put("pot", pot);
+        user.put("age", age);
+
+// Add a new document with a generated ID
+        db.collection("posts")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        System.out.println("DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println("Error adding document" + e);
+                    }
+                });
+
+    }
+
+    void getDoc(){
+        DocumentReference docRef = db.collection("posts").document(username);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        System.out.println("DocumentSnapshot data: " + document.getData());
+
+                    } else {
+                        System.out.println( "No such document");
+                    }
+                } else {
+                    System.out.println("get failed with " + task.getException());
+                }
+            }
+        });
+
+    }
 }
