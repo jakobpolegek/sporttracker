@@ -100,10 +100,15 @@ public class ApplicationMy extends Application {
 
     }
     public void updateUser(){
-        thisUser.setHeight(sp.getFloat(HEIGHT,0));
-        thisUser.setWeight(sp.getFloat(WEIGHT,0));
-        thisUser.setAge(sp.getInt(AGE,0));
+        try{
+            thisUser.setHeight(sp.getFloat(HEIGHT,0));
+            thisUser.setWeight(sp.getFloat(WEIGHT,0));
+            thisUser.setAge(sp.getInt(AGE,0));
+        }catch (Exception e){
+            System.out.println(e);
+        }
         thisUser.addToFirebase();
+
     }
 
     private void onAddItem(){

@@ -32,4 +32,5 @@
     <string name="username">Username</string>
     <string name="_18">18+</string>
     <string name="age">Age</string>
+    <string name="after_pressing_record_point_the_camera_at_your_face_and_film_it_for_10_seconds_until_it_stops">After pressing record point the camera at your face and film it for 10 seconds until it stops.</string>
 </resources>

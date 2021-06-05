@@ -120,6 +120,7 @@ public class RunningActivity extends AppCompatActivity {
             double longitude=location.getLongitude();
             app.thisUser.addLocation(new User.Lokacija(latitude,longitude));
             String msg="New Latitude: "+latitude + "New Longitude: "+longitude;
+            System.out.println(msg);
             Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
         }
 

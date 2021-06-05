@@ -88,7 +88,6 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putFloat(HEIGHT,Float.parseFloat(etHeight.getText().toString()));
             editor.apply();
             //app.thisUser.setHeight(Double.parseDouble(etHeight.getText().toString()));
-            System.out.println("WEight:: " + Double.parseDouble(etHeight.getText().toString()));
         }
         if (!etWeight.getText().toString().equals("")){
             editor.putFloat(WEIGHT,Float.parseFloat(etWeight.getText().toString()));
