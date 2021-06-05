@@ -6,7 +6,7 @@ import { db, auth } from "./firebase";
 import { Button, makeStyles, Modal, Input } from "@material-ui/core";
 import FlipMove from "react-flip-move";
 import ReactDOM from 'react-dom';
-  
+
 
 function getModalStyle() {
   const top = 50;
@@ -65,7 +65,7 @@ function App() {
   }, [user, username]);
 
   useEffect(() => {
-    db.collection("posts")
+      db.collection("posts")
       .onSnapshot((snapshot) =>
         setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
       );

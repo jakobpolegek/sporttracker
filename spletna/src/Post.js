@@ -1,9 +1,13 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import "./Post.css";
 import { db } from "./firebase";
-import firebase from "firebase"; 
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
+import { List } from "@material-ui/core";
+
+
 //pot={post.pot["lon"]}
 //<br></br><b>PATH:{pot} </b>
+
 const Post = forwardRef(
   ({ user, username, postId, caption, height,weight,calories_burned,avg_heartrate,time,distance,pot}, ref) => {
     useEffect(() => {
@@ -21,6 +25,14 @@ const Post = forwardRef(
         unsubscribe();
       };
     }, [postId]);
+
+    var longtitude;
+    var latitude;
+    var array = Array();
+    const alo = true;
+    const limeOptions = { color: 'blue' }
+
+
     return (
       <div className="post" ref={ref}>
         <div className="post__header">
@@ -36,9 +48,37 @@ const Post = forwardRef(
             <br></br><b>DISTANCE: </b>{distance} meters.
             <div>
             <b>LOCATION: </b>
-              {pot.map(item => (
-                <p><b>Lon: </b>{item.lon}<br/><b>Lat: </b>{item.lat}<br/></p>
-                ))}
+            <MapContainer center={[pot[0].lat, pot[0].lon]} zoom={9} scrollWheelZoom={false}>
+                  <TileLayer
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  {pot.slice(0,1).map(item => (
+                  
+                  latitude= `${item.lat}`,
+                  longtitude= `${item.lon}`,
+                  array.push([item.lat, item.lon]),
+                  
+                  <Marker position={[item.lat, item.lon]}>
+                  <Polyline pathOptions={limeOptions} positions={array} />
+                  <Popup>Starting point.</Popup>
+                  </Marker>
+                  
+                  ))},
+
+
+                  {pot.slice(1).map(item => (
+                  latitude= `${item.lat}`,
+                  longtitude= `${item.lon}`,
+                  array.push([item.lat, item.lon]),
+                  
+                  <Marker position={[item.lat, item.lon]}>
+                  <Polyline pathOptions={limeOptions} positions={array} />
+                  <Popup>You were here: {[item.lat," ",item.lon]}</Popup>
+                  </Marker>
+                  ))}
+            </MapContainer>
+            
           </div>
         </h4>
       </div>

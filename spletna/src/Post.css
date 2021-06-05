@@ -1,11 +1,18 @@
 .post {
-  border: 2px solid #F6A03D;
+  border: 2px solid #96bae9;
   width: fit-content;
   margin-bottom: 8%;
-  background-color: #10486b;
-  color: white;
+  background-color: #10485c;
+  color: #96bae9;
   width: 500px;
 }
+
+.leaflet-container{
+  z-index: 0;
+  width: 25wh;
+  height: 40vh;
+}
+
 
 .post__image {
   width: 100%;
@@ -21,7 +28,7 @@
   align-items: center;
   text-align: left;
   padding: 10px;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid #96bae9;
 }
 
 .post__text {
@@ -47,12 +54,12 @@
   flex: 1;
   border: none;
   padding: 10px;
-  border-top: 1px solid lightgray;
+  border-top: 1px solid #96bae9;
 }
 
 .post__button {
   border: none;
   color: white;
-  background-color: #C58031;
+  background-color: #10486b;
   flex: 0;
 }
