@@ -84,12 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OpenLeaderboards(View view) {
-        app.thisUser.addLocation(new User.Lokacija(1,2));
-        app.thisUser.addLocation(new User.Lokacija(2,3));
-        app.thisUser.setHeight(sp.getFloat(HEIGHT,0));
-        app.thisUser.setWeight(sp.getFloat(WEIGHT,0));
-        app.thisUser.setAge(sp.getInt(AGE,0));
-        app.thisUser.addToFirebase();
+
     }
 
     public void OpenMyPreviousRuns(View view) {

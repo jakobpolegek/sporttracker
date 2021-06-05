@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
@@ -31,6 +32,8 @@ public class RunningActivity extends AppCompatActivity {
     long startTime = 0;
     long time = 0;
 
+    ApplicationMy app;
+
     LocationManager locationManager;
     Context mContext;
 
@@ -47,6 +50,8 @@ public class RunningActivity extends AppCompatActivity {
             int minutes = seconds / 60;
             seconds = seconds % 60;
             centiseconds = centiseconds % 100;
+
+            app = (ApplicationMy) getApplication();
 
             timerTextView.setText("Time: " + String.format("%d:%02d:%02d", minutes, seconds,centiseconds));
 
@@ -75,7 +80,7 @@ public class RunningActivity extends AppCompatActivity {
                 if (b.getText().equals("stop")) {
 
                     timerHandler.removeCallbacks(timerRunnable);
-
+                    app.updateUser();
                     startActivity(new Intent(RunningActivity.this,VideoActivity.class));
                     //b.setText("start");
 
@@ -113,9 +118,8 @@ public class RunningActivity extends AppCompatActivity {
         public void onLocationChanged(android.location.Location location) {
             double latitude=location.getLatitude();
             double longitude=location.getLongitude();
-
+            app.thisUser.addLocation(new User.Lokacija(latitude,longitude));
             String msg="New Latitude: "+latitude + "New Longitude: "+longitude;
-            System.out.println(msg);
             Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
         }
 

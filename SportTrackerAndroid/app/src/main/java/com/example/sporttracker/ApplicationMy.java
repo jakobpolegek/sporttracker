@@ -95,8 +95,15 @@ public class ApplicationMy extends Application {
 
 
     }
-    public void updateUser(){
 
+    public void upload(){
+
+    }
+    public void updateUser(){
+        thisUser.setHeight(sp.getFloat(HEIGHT,0));
+        thisUser.setWeight(sp.getFloat(WEIGHT,0));
+        thisUser.setAge(sp.getInt(AGE,0));
+        thisUser.addToFirebase();
     }
 
     private void onAddItem(){
