@@ -1,5 +1,6 @@
 package com.example.sporttracker;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,12 +10,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button logout;
+    private TextView textViewUser;
+    private String userID;
+
+    private FirebaseUser user;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +42,29 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            }
+        });
+
+        textViewUser = findViewById(R.id.userTxt);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        reference = FirebaseDatabase.getInstance().getReference("Users");
+        userID = user.getUid();
+
+        reference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User userPRofile = snapshot.getValue(User.class);
+
+                if(userPRofile != null){
+                    String username = userPRofile.username;
+
+                    textViewUser.setText("Welcome " + username);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this,"Something wrong happened!", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -46,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OpenNewRun(View view) {
-        Intent i = new Intent(getBaseContext(), MapsActivity.class);
+        Intent i = new Intent(getBaseContext(), RunningActivity.class);
         startActivity(i);
     }
 

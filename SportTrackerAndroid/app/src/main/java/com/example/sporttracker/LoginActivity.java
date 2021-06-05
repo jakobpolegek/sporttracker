@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
         if(password.length() < 6){
-            editTextPassword.setError("Password is required!");
+            editTextPassword.setError("Password is too short!");
             editTextPassword.requestFocus();
             return;
         }
@@ -98,13 +98,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     }else{
                         user.sendEmailVerification();
-                        Toast.makeText(LoginActivity.this, "Check your email to verify!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), "Check your email to verify!", Toast.LENGTH_LONG).show();
                         System.out.println("Verify");
                         progressBar.setVisibility(View.GONE);
                     }
 
                 }else{
-                    Toast.makeText(LoginActivity.this, "Failed to login! Please check your credentials", Toast.LENGTH_LONG).show();
+                    editTextEmail.setError("Unknown email or password!");
+                    editTextEmail.requestFocus();
+                    Toast.makeText(getBaseContext(), "Failed to login! Please check your credentials", Toast.LENGTH_LONG).show();
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });

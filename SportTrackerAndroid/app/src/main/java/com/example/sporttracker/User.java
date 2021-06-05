@@ -26,6 +26,10 @@ public class User {
     }
     //endregion
 
+    void addLocation(){
+
+    }
+
     //region Getter
 
     public String getEmail() {
