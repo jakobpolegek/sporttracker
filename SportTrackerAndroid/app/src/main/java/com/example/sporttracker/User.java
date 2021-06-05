@@ -1,6 +1,14 @@
 package com.example.sporttracker;
 
+import java.util.Vector;
+
 public class User {
+
+    static class Lokacija{
+        double lat;
+        double lon;
+    }
+
     String username;
     String email;
 
@@ -8,6 +16,9 @@ public class User {
     String pathToVideo;
     int age;
     double heartRate, height, weight, burnedCalories;
+    Vector<Lokacija> pot;
+
+
 
     public User(){}
 
@@ -16,6 +27,7 @@ public class User {
     public User(String username, String email){
         this.username = username;
         this.email = email;
+        pot = new Vector<Lokacija>();
     }
 
     public User(String username, int age, double height, double weight) {
@@ -23,14 +35,20 @@ public class User {
         this.age = age;
         this.height = height;
         this.weight = weight;
+        pot = new Vector<Lokacija>();
     }
     //endregion
 
-    void addLocation(){
-
+    void addLocation(Lokacija l){
+        pot.add(l);
     }
 
     //region Getter
+
+
+    public Vector<Lokacija> getPot() {
+        return pot;
+    }
 
     public String getEmail() {
         return email;

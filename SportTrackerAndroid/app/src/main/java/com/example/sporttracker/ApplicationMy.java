@@ -32,4 +32,8 @@ public class ApplicationMy extends Application {
         }
     }
 
+    private void onAddItem(){
+        //CollectionReference restaurants = mFirestore.collection("restaurants");
+    }
+
 }

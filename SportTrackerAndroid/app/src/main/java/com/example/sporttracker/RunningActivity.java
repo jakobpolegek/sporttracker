@@ -42,13 +42,15 @@ public class RunningActivity extends AppCompatActivity {
         public void run() {
             long millis = System.currentTimeMillis() - startTime;
             time = millis;
+            int centiseconds = (int) (millis / 10);
             int seconds = (int) (millis / 1000);
             int minutes = seconds / 60;
             seconds = seconds % 60;
+            centiseconds = centiseconds % 100;
 
-            timerTextView.setText("Time: " + String.format("%d:%02d", minutes, seconds));
+            timerTextView.setText("Time: " + String.format("%d:%02d:%02d", minutes, seconds,centiseconds));
 
-            timerHandler.postDelayed(this, 500);
+            timerHandler.postDelayed(this, 10);
         }
     };
 
@@ -59,6 +61,9 @@ public class RunningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_running);
 
         timerTextView = (TextView) findViewById(R.id.timerTextView);
+
+        mContext = this;
+        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         Button b = (Button) findViewById(R.id.button);
         b.setText("start");
@@ -71,31 +76,33 @@ public class RunningActivity extends AppCompatActivity {
 
                     timerHandler.removeCallbacks(timerRunnable);
                     b.setText("start");
+
                 } else {
                     startTime = System.currentTimeMillis();
                     startTime = startTime - time;
                     timerHandler.postDelayed(timerRunnable, 0);
                     b.setText("stop");
+                    if (ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            3000,
+                            0, locationListenerGPS);
+                    isLocationEnabled();
+
                 }
             }
         });
 
-        mContext = this;
-        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                2000,
-                10, locationListenerGPS);
-        isLocationEnabled();
+
+
 
     }
 
@@ -104,7 +111,9 @@ public class RunningActivity extends AppCompatActivity {
         public void onLocationChanged(android.location.Location location) {
             double latitude=location.getLatitude();
             double longitude=location.getLongitude();
+
             String msg="New Latitude: "+latitude + "New Longitude: "+longitude;
+            System.out.println(msg);
             Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
         }
 
@@ -128,6 +137,7 @@ public class RunningActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         timerHandler.removeCallbacks(timerRunnable);
+        locationManager.removeUpdates(locationListenerGPS);
         Button b = (Button)findViewById(R.id.button);
         b.setText("start");
     }
