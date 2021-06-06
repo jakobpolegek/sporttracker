@@ -1,5 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, firestore
 import json
 import cgitb
 import requests
@@ -21,46 +21,75 @@ config = {
     "serviceAccount": "serviceAccountKey.json"
 }
 
-cred_obj = firebase_admin.credentials.Certificate('sporttracker-fd60b-firebase-adminsdk-grtam-e5a2525474.json')
+cred_obj = firebase_admin.credentials.Certificate('sporttracker-fd60b-firebase-adminsdk-grtam-c6be9fa9e8.json')
 default_app = firebase_admin.initialize_app(cred_obj, {
 	'databaseURL':'https://sporttracker-fd60b-default-rtdb.europe-west1.firebasedatabase.app/'
 	})
+
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 
 @app.route('/')
 def index():
-	return "Neki je"
+	return "<html><header><title>Website</title></header><h1>Prazna stran :)</h1></html>"
 
 @app.route("/test", methods=['GET', 'POST', 'OPTIONS'])
 def test():
 	if request.method == 'POST':
-#		return "empty"
-		firebase_storage = pyrebase.initialize_app(config)
-		storage = firebase_storage.storage()
-		storage.child("videomitja.mp4").download("videomitja.mp4")
+		data=request.get_json()
+		print(data)
+		idDoc = data["idDoc"]
+		#from firebase_admin import db
+		print(idDoc)
+		firestore_db = firestore.client()
+		snapshots=firestore_db.collection("posts").document(idDoc).get()
+		if snapshots.exists:
+			print('Document data: '+str(snapshots.to_dict()))
+		else:
+			print('Nic ni tule!')
+			return "Wrong ID!"
+		dataList=snapshots.to_dict()
+		username=dataList["username"]
+		print(username)
+		#print(post.get().to_dict())
+
+		#firebase_storage = pyrebase.initialize_app(config)
+		#storage = firebase_storage.storage()
+		#storage.child("videomitja").download("videomitja.mp4")
 		#IZRACUNAVANJE
 
 		#KONEC IZRACUNAVANJA
 		#ZBRIŠE DATOTEKO IZ SERVERJA
-		os.remove("videomitja.mp4")
+		#os.remove("videomitja.mp4")
 		#############################
-		data=request.get_json()
-		print(data)
-		ime = request.form.get("ime")
-		priimek = request.form.get("priimek")
-		starost = request.form.get("starost")
-		print(ime)
-		print(priimek)
-		print(starost)
-		from firebase_admin import db
+		
+		#from firebase_admin import db
 		#jsonData=json.loads(self.get('data'))
-		ref = db.reference("/")
-		ref.push().set(data)
+		#ref = db.reference("/")
+		#ref.push().set(data)
 		return data
 	else:
 		return "GET probs"
+
+@app.route("/processData", methods=['GET', 'POST', 'OPTIONS'])
+def processData():
+	if request.method == 'POST':
+		print(data)
+		idDoc = data["idDoc"]
+		print(idDoc)
+		firestore_db = firestore.client()
+		snapshots=firestore_db.collection("posts").document(idDoc).get()
+		if snapshots.exists:
+			print('Document data: '+str(snapshots.to_dict()))
+		else:
+			print('Nic ni tule!')
+			return "Wrong ID!"
+		dataList=snapshots.to_dict()
+		username=dataList["username"]
+		print(username)
+	else:
+		return "<html><header><title>Website</title></header><h1>Se ena prazna stran :)</h1></html>"
 
 if __name__=="__main__":
 	app.run(debug=True)
