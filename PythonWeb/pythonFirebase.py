@@ -57,6 +57,7 @@ def test():
 		#firebase_storage = pyrebase.initialize_app(config)
 		#storage = firebase_storage.storage()
 		#storage.child("videomitja").download("videomitja.mp4")
+
 		#IZRACUNAVANJE
 
 		#KONEC IZRACUNAVANJA
