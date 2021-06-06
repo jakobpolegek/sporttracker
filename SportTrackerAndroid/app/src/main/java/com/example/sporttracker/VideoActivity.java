@@ -40,7 +40,7 @@ public class VideoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT,10);
+                intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT,25);
                 startActivityForResult(intent,1);
             }
         });
@@ -58,7 +58,7 @@ public class VideoActivity extends AppCompatActivity {
             sp = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
             ProgressDialog progressDialog = new ProgressDialog(VideoActivity.this);
-            final StorageReference photoRef = storageRef.child("Video").child("video" + sp.getString(USERNAME,"DEFAULT VALUE "));
+            final StorageReference photoRef = storageRef.child("video" + sp.getString(USERNAME,"DEFAULT VALUE "));
 // add File/URI
             assert data != null;
             photoRef.putFile(data.getData())
