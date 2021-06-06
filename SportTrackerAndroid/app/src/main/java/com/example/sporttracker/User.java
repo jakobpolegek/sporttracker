@@ -53,6 +53,7 @@ public class User {
     String pathToVideo;
     int timeInSeconds;
     int age;
+    double distance;
     double heartRate, height, weight, burnedCalories;
     Vector<Lokacija> pot;
 
@@ -188,6 +189,31 @@ public class User {
                     }
                 });
 
+    }
+
+    double calculateDistance(){
+        return 1;
+    }
+
+    double getDistanceBetweenPoints(Lokacija a, Lokacija b){
+        double lat_a = a.lat;
+        double lat_b = b.lat;
+        double lng_a = a.lon;
+        double lng_b = b.lon;
+
+        float pk = (float) (180.f/Math.PI);
+
+        double a1 = lat_a / pk;
+        double a2 = lng_a / pk;
+        double b1 = lat_b / pk;
+        double b2 = lng_b / pk;
+
+        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
+        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
+        double t3 = Math.sin(a1) * Math.sin(b1);
+        double tt = Math.acos(t1 + t2 + t3);
+
+        return 6366000 * tt;
     }
 
     void getDoc(){
