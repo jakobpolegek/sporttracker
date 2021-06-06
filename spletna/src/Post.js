@@ -48,7 +48,7 @@ const Post = forwardRef(
             <br></br><b>DISTANCE: </b>{distance} meters.
             <div>
             <b>LOCATION: </b>
-            <MapContainer center={[pot[0].lat, pot[0].lon]} zoom={14} scrollWheelZoom={false}>
+            <MapContainer center={[pot[0].lat, pot[0].lon]} zoom={28} scrollWheelZoom={false}>
                   <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
