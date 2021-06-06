@@ -81,6 +81,7 @@ public class RunningActivity extends AppCompatActivity  {
             int seconds = (int) (millis / 1000);
             int minutes = seconds / 60;
             seconds = seconds % 60;
+            app.thisUser.setTimeInSeconds(seconds);
             centiseconds = centiseconds % 100;
 
             app = (ApplicationMy) getApplication();

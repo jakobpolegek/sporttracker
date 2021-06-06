@@ -51,6 +51,7 @@ public class User {
 
 
     String pathToVideo;
+    int timeInSeconds;
     int age;
     double heartRate, height, weight, burnedCalories;
     Vector<Lokacija> pot;
@@ -124,6 +125,10 @@ public class User {
     //region Setter
 
 
+    public void setTimeInSeconds(int timeInSeconds) {
+        this.timeInSeconds = timeInSeconds;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -161,6 +166,7 @@ public class User {
     void addToFirebase(){
         Map<String, Object> user = new HashMap<>();
         user.put("username", username);
+        user.put("time", timeInSeconds);
         user.put("weight", weight);
         user.put("height", height);
         user.put("pot", pot);

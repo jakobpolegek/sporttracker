@@ -92,9 +92,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void OpenMyPreviousRuns(View view) {
-
-    }
 
     public void onClick_OpenSettings(MenuItem item) {
         Intent i = new Intent(getBaseContext(), SettingsActivity.class);
