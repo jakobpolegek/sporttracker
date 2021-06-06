@@ -102,6 +102,9 @@ public class ApplicationMy extends Application {
     public void addLocation(User.Lokacija a){
         thisUser.addLocation(a);
     }
+    public void setTime(int sec){
+        thisUser.setTimeInSeconds(sec);
+    }
     public void updateUser(){
         try{
             thisUser.setHeight(sp.getFloat(HEIGHT,0));

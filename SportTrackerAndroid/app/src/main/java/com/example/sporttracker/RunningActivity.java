@@ -68,6 +68,7 @@ public class RunningActivity extends AppCompatActivity  {
     ApplicationMy app;
 
     Context mContext;
+    int timeInSeconds;
 
     //runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
@@ -79,12 +80,14 @@ public class RunningActivity extends AppCompatActivity  {
             time = millis;
             int centiseconds = (int) (millis / 10);
             int seconds = (int) (millis / 1000);
+            timeInSeconds = seconds;
             int minutes = seconds / 60;
             seconds = seconds % 60;
-            app.thisUser.setTimeInSeconds(seconds);
+
+
             centiseconds = centiseconds % 100;
 
-            app = (ApplicationMy) getApplication();
+
 
             timerTextView.setText("Time: " + String.format("%d:%02d:%02d", minutes, seconds, centiseconds));
 
@@ -101,7 +104,7 @@ public class RunningActivity extends AppCompatActivity  {
 
         timerTextView = (TextView) findViewById(R.id.timerTextView);
 
-
+        app = (ApplicationMy) getApplication();
         mContext = this;
         Button b = (Button) findViewById(R.id.button);
         b.setText("start");
@@ -111,7 +114,7 @@ public class RunningActivity extends AppCompatActivity  {
             public void onClick(View v) {
                 Button b = (Button) v;
                 if (b.getText().equals("stop")) {
-
+                    app.setTime(timeInSeconds);
                     timerHandler.removeCallbacks(timerRunnable);
                     app.updateUser();
                     startActivity(new Intent(RunningActivity.this, VideoActivity.class));
