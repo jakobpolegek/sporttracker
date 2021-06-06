@@ -53,7 +53,7 @@ public class User {
     String pathToVideo;
     int timeInSeconds;
     int age;
-    double distance;
+    int distance;
     double heartRate, height, weight, burnedCalories;
     Vector<Lokacija> pot;
 
@@ -67,6 +67,7 @@ public class User {
     public User(String username, String email){
         this.username = username;
         this.email = email;
+        this.distance = 0;
         pot = new Vector<Lokacija>();
     }
 
@@ -75,6 +76,7 @@ public class User {
         this.age = age;
         this.height = height;
         this.weight = weight;
+        this.distance = 0;
         pot = new Vector<Lokacija>();
     }
     //endregion
@@ -171,6 +173,8 @@ public class User {
         user.put("weight", weight);
         user.put("height", height);
         user.put("pot", pot);
+        calculateDistance();
+        user.put("distance", distance);
         user.put("age", age);
 
 // Add a new document with a generated ID
@@ -192,7 +196,10 @@ public class User {
     }
 
     double calculateDistance(){
-        return 1;
+        for(int i = 0; i < pot.size()-1;i++){
+            distance += getDistanceBetweenPoints(pot.get(i), pot.get(i + 1));
+        }
+        return distance;
     }
 
     double getDistanceBetweenPoints(Lokacija a, Lokacija b){

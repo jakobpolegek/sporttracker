@@ -117,6 +117,7 @@ public class RunningActivity extends AppCompatActivity  {
                     app.setTime(timeInSeconds);
                     timerHandler.removeCallbacks(timerRunnable);
                     app.updateUser();
+
                     startActivity(new Intent(RunningActivity.this, VideoActivity.class));
                     //b.setText("start");
 
@@ -125,33 +126,34 @@ public class RunningActivity extends AppCompatActivity  {
                     startTime = startTime - time;
                     timerHandler.postDelayed(timerRunnable, 0);
                     b.setText("stop");
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(RunningActivity.this);
+                    fetchLastLocation();
+                    mlocationCallback = new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            if (locationResult == null) {
+                                return;
+                            }
+                            for (Location location : locationResult.getLocations()) {
+                                double lat = location.getLatitude();
+                                double lng = location.getLongitude();
+                                app.addLocation(new User.Lokacija(lat,lng));
+                                Log.e("CONTINIOUSLOC: ", location.toString());
+                            }
+                        };
+                    };
+
+                    mLocationRequest = createLocationRequest();
+                    builder = new LocationSettingsRequest.Builder()
+                            .addLocationRequest(mLocationRequest);
+                    checkLocationSetting(builder);
 
 
                 }
             }
         });
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fetchLastLocation();
-        mlocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    double lat = location.getLatitude();
-                    double lng = location.getLongitude();
-                    app.addLocation(new User.Lokacija(lat,lng));
-                    Log.e("CONTINIOUSLOC: ", location.toString());
-                }
-            };
-        };
 
-        mLocationRequest = createLocationRequest();
-        builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
-        checkLocationSetting(builder);
 
 
     }
@@ -178,6 +180,7 @@ public class RunningActivity extends AppCompatActivity  {
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
+                            app.addLocation(new User.Lokacija(location.getLatitude(),location.getLongitude()));
                             Log.e("LAST LOCATION: ", location.toString()); // You will get your last location here
                         }
                     }
@@ -207,8 +210,8 @@ public class RunningActivity extends AppCompatActivity  {
     protected LocationRequest createLocationRequest() {
         LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(3000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setSmallestDisplacement(1);
+        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setSmallestDisplacement(0);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return mLocationRequest;
     }
@@ -316,6 +319,7 @@ public class RunningActivity extends AppCompatActivity  {
     @Override
     public void onStop() {
         super.onStop();
+        stopLocationUpdates();
     }
 
 
@@ -324,6 +328,7 @@ public class RunningActivity extends AppCompatActivity  {
     @Override
     public void onPause() {
         super.onPause();
+        stopLocationUpdates();
         //timerHandler.removeCallbacks(timerRunnable);
         //Button b = (Button)findViewById(R.id.button);
         //b.setText("start");

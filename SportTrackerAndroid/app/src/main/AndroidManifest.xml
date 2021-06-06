@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:screenOrientation="portrait"
         android:usesCleartextTraffic="true"
         android:name=".ApplicationMy"
         android:allowBackup="true"
