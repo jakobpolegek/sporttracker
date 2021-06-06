@@ -14,4 +14,4 @@ config = {
 firebase_storage = pyrebase.initialize_app(config)
 storage = firebase_storage.storage()
 
-storage.child("videomitja.mp4").download("videomitja.mp4")
+storage.child("videojan").download("videojan.mp4")
