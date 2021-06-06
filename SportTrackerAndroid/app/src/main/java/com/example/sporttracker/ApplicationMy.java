@@ -38,6 +38,7 @@ public class ApplicationMy extends Application {
     public void onCreate() {
         super.onCreate();
 
+
         sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //createUser();
         getUUID();
@@ -64,7 +65,9 @@ public class ApplicationMy extends Application {
                 User userPRofile = snapshot.getValue(User.class);
 
                 if(userPRofile != null){
-                    thisUser = new User(userPRofile.username,userPRofile.email);
+                    thisUser = new User("username","email");
+                    thisUser.setUsername(userPRofile.username);
+                    thisUser.setEmail(userPRofile.email);
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putString(USERNAME,userPRofile.username);
                     editor.apply();
@@ -96,8 +99,8 @@ public class ApplicationMy extends Application {
 
     }
 
-    public void upload(){
-
+    public void addLocation(User.Lokacija a){
+        thisUser.addLocation(a);
     }
     public void updateUser(){
         try{

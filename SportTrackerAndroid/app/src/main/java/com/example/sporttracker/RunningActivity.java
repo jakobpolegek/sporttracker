@@ -1,5 +1,7 @@
 package com.example.sporttracker;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,32 +11,62 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
+
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
-public class RunningActivity extends AppCompatActivity {
+import java.text.DateFormat;
+import java.util.Date;
 
+public class RunningActivity extends AppCompatActivity  {
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest mLocationRequest;
+    private LocationCallback mlocationCallback;
+    private LocationSettingsRequest.Builder builder;
+    private static final int REQUEST_CHECK_SETTINGS = 102;
+
+    private static final String TAG = "RunningActivity";
     TextView timerTextView;
     long startTime = 0;
     long time = 0;
+    String mLastUpdateTime;
+
+    private static final long INTERVAL = 1000 * 10;
+    private static final long FASTEST_INTERVAL = 1000 * 5;
 
     ApplicationMy app;
 
-    LocationManager locationManager;
     Context mContext;
 
     //runs without a timer by reposting this handler at the end of the runnable
@@ -53,11 +85,12 @@ public class RunningActivity extends AppCompatActivity {
 
             app = (ApplicationMy) getApplication();
 
-            timerTextView.setText("Time: " + String.format("%d:%02d:%02d", minutes, seconds,centiseconds));
+            timerTextView.setText("Time: " + String.format("%d:%02d:%02d", minutes, seconds, centiseconds));
 
             timerHandler.postDelayed(this, 10);
         }
     };
+
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -67,9 +100,8 @@ public class RunningActivity extends AppCompatActivity {
 
         timerTextView = (TextView) findViewById(R.id.timerTextView);
 
-        mContext = this;
-        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
+        mContext = this;
         Button b = (Button) findViewById(R.id.button);
         b.setText("start");
         b.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +113,7 @@ public class RunningActivity extends AppCompatActivity {
 
                     timerHandler.removeCallbacks(timerRunnable);
                     app.updateUser();
-                    startActivity(new Intent(RunningActivity.this,VideoActivity.class));
+                    startActivity(new Intent(RunningActivity.this, VideoActivity.class));
                     //b.setText("start");
 
                 } else {
@@ -89,105 +121,217 @@ public class RunningActivity extends AppCompatActivity {
                     startTime = startTime - time;
                     timerHandler.postDelayed(timerRunnable, 0);
                     b.setText("stop");
-                    if (ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            3000,
-                            0, locationListenerGPS);
-                    isLocationEnabled();
+
 
                 }
             }
         });
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fetchLastLocation();
+        mlocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    double lat = location.getLatitude();
+                    double lng = location.getLongitude();
+                    app.addLocation(new User.Lokacija(lat,lng));
+                    Log.e("CONTINIOUSLOC: ", location.toString());
+                }
+            };
+        };
 
+        mLocationRequest = createLocationRequest();
+        builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        checkLocationSetting(builder);
 
 
     }
 
-    LocationListener locationListenerGPS=new LocationListener() {
-        @Override
-        public void onLocationChanged(android.location.Location location) {
-            double latitude=location.getLatitude();
-            double longitude=location.getLongitude();
-            app.thisUser.addLocation(new User.Lokacija(latitude,longitude));
-            String msg="New Latitude: "+latitude + "New Longitude: "+longitude;
-            System.out.println(msg);
-            Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
+    private void fetchLastLocation() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    Activity#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+//                    Toast.makeText(MainActivity.this, "Permission not granted, Kindly allow permission", Toast.LENGTH_LONG).show();
+                showPermissionAlert();
+                return;
+            }
         }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            Log.e("LAST LOCATION: ", location.toString()); // You will get your last location here
+                        }
+                    }
+                });
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 123: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    // permission was denied, show alert to explain permission
+                    showPermissionAlert();
+                } else {
+                    //permission is granted now start a background service
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        fetchLastLocation();
+                    }
+                }
+            }
         }
+    }
+    protected LocationRequest createLocationRequest() {
+        LocationRequest mLocationRequest = LocationRequest.create();
+        mLocationRequest.setInterval(3000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setSmallestDisplacement(1);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return mLocationRequest;
+    }
 
-        @Override
-        public void onProviderEnabled(String provider) {
+    private void checkLocationSetting(LocationSettingsRequest.Builder builder) {
 
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+                startLocationUpdates();
+                return;
+            }
+        });
+
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull final Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but this can be fixed
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(mContext);
+                    builder1.setTitle("Continious Location Request");
+                    builder1.setMessage("This request is essential to get location update continiously");
+                    builder1.create();
+                    builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ResolvableApiException resolvable = (ResolvableApiException) e;
+                            try {
+                                resolvable.startResolutionForResult(RunningActivity.this,
+                                        REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    });
+                    builder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(mContext, "Location update permission not granted", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder1.show();
+                }
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                startLocationUpdates();
+            } else {
+                checkLocationSetting(builder);
+            }
         }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
+    }
+    public void startLocationUpdates() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    Activity#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+                return;
+            }
         }
-    };
+        fusedLocationClient.requestLocationUpdates(mLocationRequest,
+                mlocationCallback,
+                null /* Looper */);
+    }
+
+
+
+    private void stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(mlocationCallback);
+    }
+
+    private void showPermissionAlert(){
+        if (ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(RunningActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(RunningActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+
+
 
     @Override
     public void onPause() {
         super.onPause();
-
-        timerHandler.removeCallbacks(timerRunnable);
-        locationManager.removeUpdates(locationListenerGPS);
-        Button b = (Button)findViewById(R.id.button);
-        b.setText("start");
+        //timerHandler.removeCallbacks(timerRunnable);
+        //Button b = (Button)findViewById(R.id.button);
+        //b.setText("start");
     }
+
+
 
     protected void onResume(){
         super.onResume();
-        isLocationEnabled();
     }
 
-    private void isLocationEnabled() {
 
-        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            AlertDialog.Builder alertDialog=new AlertDialog.Builder(mContext);
-            alertDialog.setTitle("Enable Location");
-            alertDialog.setMessage("Your locations setting is not enabled. Please enabled it in settings menu.");
-            alertDialog.setPositiveButton("Location Settings", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(intent);
-                }
-            });
-            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            AlertDialog alert=alertDialog.create();
-            alert.show();
-        }
-        else{
-            AlertDialog.Builder alertDialog=new AlertDialog.Builder(mContext);
-            alertDialog.setTitle("Confirm Location");
-            alertDialog.setMessage("Your Location is enabled, please enjoy");
-            alertDialog.setNegativeButton("Back to interface",new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            AlertDialog alert=alertDialog.create();
-            alert.show();
-        }
-    }
 
 
 

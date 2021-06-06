@@ -1,13 +1,13 @@
 package com.example.lib;
 
-public class User {
+public class UserTest {
     String username;
     String pathToVideo;
     int age;
     double heartRate, height, weight, burnedCalories;
 
     //region Constructors
-    public User(String username, int age, double height, double weight) {
+    public UserTest(String username, int age, double height, double weight) {
         this.username = username;
         this.age = age;
         this.height = height;

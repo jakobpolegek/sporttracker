@@ -67,7 +67,7 @@ public class VideoActivity extends AppCompatActivity {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // Upload succeeded
                             Toast.makeText(getApplicationContext(), "Upload Success...", Toast.LENGTH_SHORT).show();
-
+                            startActivity(new Intent(VideoActivity.this,MainActivity.class));
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -88,6 +88,7 @@ public class VideoActivity extends AppCompatActivity {
                             progressDialog.setMessage("Uploaded " + ((int) progress) + "%...");
                         }
                     });
+
 
         }
     }
