@@ -36,6 +36,8 @@ public class VideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_video);
         app = (ApplicationMy) getApplication();
 
+
+
         findViewById(R.id.record).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,7 +60,7 @@ public class VideoActivity extends AppCompatActivity {
             sp = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
             ProgressDialog progressDialog = new ProgressDialog(VideoActivity.this);
-            final StorageReference photoRef = storageRef.child("video" + sp.getString(USERNAME,"DEFAULT VALUE "));
+            final StorageReference photoRef = storageRef.child("video" + app.thisUser.getDocID());
 // add File/URI
             assert data != null;
             photoRef.putFile(data.getData())

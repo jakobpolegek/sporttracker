@@ -51,7 +51,7 @@ public class User {
     String email;
 
 
-    String pathToVideo;
+    String docID;
     int timeInSeconds;
     int age;
     int distance;
@@ -101,8 +101,8 @@ public class User {
         return username;
     }
 
-    public String getPathToVideo() {
-        return pathToVideo;
+    public String getDocID() {
+        return docID;
     }
 
     public int getAge() {
@@ -153,8 +153,8 @@ public class User {
         this.email = email;
     }
 
-    public void setPathToVideo(String pathToVideo) {
-        this.pathToVideo = pathToVideo;
+    public void setDocID(String pathToVideo) {
+        this.docID = docID;
     }
 
     public void setHeartRate(double heartRate) {
@@ -189,6 +189,7 @@ public class User {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         System.out.println("DocumentSnapshot added with ID: " + documentReference.getId());
+                        docID = documentReference.getId();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
