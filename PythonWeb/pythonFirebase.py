@@ -76,6 +76,7 @@ def test():
 @app.route("/processData", methods=['GET', 'POST', 'OPTIONS'])
 def processData():
 	if request.method == 'POST':
+		data=request.get_json()
 		print(data)
 		idDoc = data["idDoc"]
 		print(idDoc)
@@ -89,6 +90,13 @@ def processData():
 		dataList=snapshots.to_dict()
 		username=dataList["username"]
 		print(username)
+		firebase_storage = pyrebase.initialize_app(config)
+		storage = firebase_storage.storage()
+		videousername="video"+idDoc
+		videousernameMP4=videousername+".mp4"
+		storage.child(str(videousername)).download(str(videousernameMP4))
+		return data
+
 	else:
 		return "<html><header><title>Website</title></header><h1>Se ena prazna stran :)</h1></html>"
 
