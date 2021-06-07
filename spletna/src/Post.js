@@ -26,6 +26,7 @@ const Post = forwardRef(
       };
     }, [postId]);
 
+    var stej;
     var longtitude;
     var latitude;
     var array = Array();
@@ -54,7 +55,7 @@ const Post = forwardRef(
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                   {pot.slice(0,1).map(item => (
-                  
+                  stej=1,
                   latitude= `${item.lat}`,
                   longtitude= `${item.lon}`,
                   array.push([item.lat, item.lon]),
@@ -71,12 +72,24 @@ const Post = forwardRef(
                   latitude= `${item.lat}`,
                   longtitude= `${item.lon}`,
                   array.push([item.lat, item.lon]),
+                  stej++,
+                  //<Marker position={[item.lat, item.lon]}>
+                  <Polyline pathOptions={limeOptions} positions={array} />
+                  //<Popup>You were here: {[item.lat," ",item.lon]}</Popup>
+                  //</Marker>
+                  ))}
+                  {pot.slice(stej-1,stej).map(item => (
+                  
+                  latitude= `${item.lat}`,
+                  longtitude= `${item.lon}`,
+                  array.push([item.lat, item.lon]),
                   
                   <Marker position={[item.lat, item.lon]}>
                   <Polyline pathOptions={limeOptions} positions={array} />
-                  <Popup>You were here: {[item.lat," ",item.lon]}</Popup>
+                  <Popup>End point.</Popup>
                   </Marker>
-                  ))}
+                  
+                  ))},
             </MapContainer>
             
           </div>
