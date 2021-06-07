@@ -14,7 +14,6 @@ import heartrate
 import preprocessing
 import eulerian
 
-print(sys.path)
 config = {
     "apiKey": "AIzaSyBrNS9Y9zKUH3CESiD-Ab5Qw-0O8_Gy47g",
     "authDomain": "sporttracker-fd60b.firebaseapp.com",
