@@ -39,6 +39,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  var numOfChild=0;
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
