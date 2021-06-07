@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "978482245151",
+    "firebase_url": "https://sporttracker-fd60b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sporttracker-fd60b",
+    "storage_bucket": "sporttracker-fd60b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978482245151:android:10fe333a1e71c902346f2a",
+        "android_client_info": {
+          "package_name": "com.example.sporttracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "978482245151-o0tmtpqpapr1hhueddc94ifdcdlnbvdf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVV3SjCgLLyVUnEgi_9gtuXuIxRkYPCGs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "978482245151-o0tmtpqpapr1hhueddc94ifdcdlnbvdf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
