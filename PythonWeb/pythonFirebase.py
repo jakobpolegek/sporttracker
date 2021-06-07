@@ -8,6 +8,11 @@ from flask_cors import CORS, cross_origin
 import pyrebase
 import sys
 import os
+import cv2
+import pyramids
+import heartrate
+import preprocessing
+import eulerian
 
 print(sys.path)
 config = {
@@ -34,45 +39,6 @@ CORS(app, support_credentials=True)
 def index():
 	return "<html><header><title>Website</title></header><h1>Prazna stran :)</h1></html>"
 
-@app.route("/test", methods=['GET', 'POST', 'OPTIONS'])
-def test():
-	if request.method == 'POST':
-		data=request.get_json()
-		print(data)
-		idDoc = data["idDoc"]
-		#from firebase_admin import db
-		print(idDoc)
-		firestore_db = firestore.client()
-		snapshots=firestore_db.collection("posts").document(idDoc).get()
-		if snapshots.exists:
-			print('Document data: '+str(snapshots.to_dict()))
-		else:
-			print('Nic ni tule!')
-			return "Wrong ID!"
-		dataList=snapshots.to_dict()
-		username=dataList["username"]
-		print(username)
-		#print(post.get().to_dict())
-
-		#firebase_storage = pyrebase.initialize_app(config)
-		#storage = firebase_storage.storage()
-		#storage.child("videomitja").download("videomitja.mp4")
-
-		#IZRACUNAVANJE
-
-		#KONEC IZRACUNAVANJA
-		#ZBRIŠE DATOTEKO IZ SERVERJA
-		#os.remove("videomitja.mp4")
-		#############################
-		
-		#from firebase_admin import db
-		#jsonData=json.loads(self.get('data'))
-		#ref = db.reference("/")
-		#ref.push().set(data)
-		return data
-	else:
-		return "GET probs"
-
 @app.route("/processData", methods=['GET', 'POST', 'OPTIONS'])
 def processData():
 	if request.method == 'POST':
@@ -89,12 +55,59 @@ def processData():
 			return "Wrong ID!"
 		dataList=snapshots.to_dict()
 		username=dataList["username"]
+		weight=dataList["weight"]
+		time=dataList["time"]
+		distance=dataList["distance"]
 		print(username)
 		firebase_storage = pyrebase.initialize_app(config)
 		storage = firebase_storage.storage()
 		videousername="video"+idDoc
 		videousernameMP4=videousername+".mp4"
-		storage.child(str(videousername)).download(str(videousernameMP4))
+		print(videousernameMP4)
+		storage.child(videousernameMP4).download(videousernameMP4)
+		#IZRACUNAVANJE
+		# Frequency range for Fast-Fourier Transform
+		freq_min = 1
+		freq_max = 1.8
+
+		# Preprocessing phase
+		video_frames, frame_ct, fps = preprocessing.read_video(videousernameMP4)
+
+		# Build Laplacian video pyramid
+		lap_video = pyramids.build_video_pyramid(video_frames)
+
+		amplified_video_pyramid = []
+
+		for i, video in enumerate(lap_video):
+			if i == 0 or i == len(lap_video)-1:
+				continue
+
+			# Eulerian magnification with temporal FFT filtering
+			result, fft, frequencies = eulerian.fft_filter(video, freq_min, freq_max, fps)
+			lap_video[i] += result
+
+			# Calculate heart rate
+			heart_rate = heartrate.find_heart_rate(fft, frequencies, freq_min, freq_max)
+
+		#IZRACUN POKURJENIH KALORIJ IN VPIS V BAZO
+		MET_formula = (3.5*weight)/200
+		calories_burned = time/60*MET_formula*3.5*weight/200
+
+		col_ref=firestore_db.collection("posts")
+		doc=col_ref.document(idDoc)
+		calories_updated={"calories_burned":calories_burned}
+		doc.update(calories_updated)
+		heartrate_updated={"avg_heartrate":heart_rate}
+		doc.update(heartrate_updated)
+		
+
+		#KONEC IZRACUNAVANJA
+		#ZBRIŠE DATOTEKO IZ SERVERJA
+		os.remove(videousernameMP4)
+		#############################
+
+
+
 		return data
 
 	else:
