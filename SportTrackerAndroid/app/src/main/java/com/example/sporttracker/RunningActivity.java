@@ -180,7 +180,7 @@ public class RunningActivity extends AppCompatActivity  {
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            app.addLocation(new User.Lokacija(location.getLatitude(),location.getLongitude()));
+                            //app.addLocation(new User.Lokacija(location.getLatitude(),location.getLongitude()));
                             Log.e("LAST LOCATION: ", location.toString()); // You will get your last location here
                         }
                     }
