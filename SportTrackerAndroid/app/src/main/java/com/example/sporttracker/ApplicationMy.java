@@ -41,6 +41,7 @@ public class ApplicationMy extends Application {
 
         sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //createUser();
+        thisUser = new User("username","email");
         getUUID();
     }
 
@@ -65,7 +66,7 @@ public class ApplicationMy extends Application {
                 User userPRofile = snapshot.getValue(User.class);
 
                 if(userPRofile != null){
-                    thisUser = new User("username","email");
+
                     thisUser.setUsername(userPRofile.username);
                     thisUser.setEmail(userPRofile.email);
                     SharedPreferences.Editor editor = sp.edit();
