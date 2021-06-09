@@ -109,4 +109,10 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_settings, menu);
         return true;
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        app.thisUser.getPot().clear();
+    }
 }
