@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -99,8 +100,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OpenNewRun(View view) {
-        Intent i = new Intent(getBaseContext(), RunningActivity.class);
-        startActivity(i);
+        if(checkSettings()){
+            Intent i = new Intent(getBaseContext(), RunningActivity.class);
+            startActivity(i);
+        }else{
+            Toast.makeText(MainActivity.this,"You have to configure your settings before starting a run!",Toast.LENGTH_LONG).show();
+        }
+
     }
 
     @Override
@@ -109,4 +115,18 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_settings, menu);
         return true;
     }
+
+    public boolean checkSettings(){
+        String etUsername = sp.getString(USERNAME,"DEFAULT VALUE");
+        float etWeight = sp.getFloat(WEIGHT,0);
+        float etHeight = sp.getFloat(HEIGHT,0);
+        float etAge = sp.getInt(AGE,0);
+        if(etUsername.equals("DEFAULT VALUE") || etUsername.equals("")) return false;
+        if(etWeight == 0) return false;
+        if(etHeight == 0) return false;
+        if(etAge == 0) return false;
+        return true;
+    }
+
+
 }

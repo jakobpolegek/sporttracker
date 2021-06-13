@@ -113,4 +113,5 @@ public class SettingsActivity extends AppCompatActivity {
     public void onClickBack(View view) {
         finish();
     }
+
 }
