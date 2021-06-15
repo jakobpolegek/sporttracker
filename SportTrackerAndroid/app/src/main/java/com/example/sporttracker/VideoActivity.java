@@ -105,7 +105,7 @@ public class VideoActivity extends AppCompatActivity {
 
         protected Void doInBackground(Void... params) {
             try {
-                URL url = new URL("http://83.212.126.21:5000/processData");
+                URL url = new URL("http://d346c0d0c294.ngrok.io/processData");
                 HttpURLConnection http = (HttpURLConnection)url.openConnection();
                 http.setRequestMethod("POST");
                 http.setDoOutput(true);
